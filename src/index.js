@@ -13,4 +13,4 @@ connectDB()
       console.log(`Server running in  on port ${PORT}`);
     });
   })
-  .catch((error) => console.error(error));
+  .catch((error) => console.log(error.message));
