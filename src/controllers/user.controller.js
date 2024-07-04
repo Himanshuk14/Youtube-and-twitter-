@@ -222,20 +222,18 @@ const updateAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "avatar file is required");
   }
   const avatar = await uploadOnCloudinary(avatarFilePath);
-  if (!avatar) {
+  if (!avatar.url) {
     throw new ApiError(500, "Error while uploading avatar");
   }
-  const user = user
-    .findByIdAndUpdate(
-      req.user?._id,
-      {
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
         avatar: avatar.url,
       },
-      {
-        new: true,
-      }
-    )
-    .select("-password -refreshToken");
+    },
+    { new: true }
+  ).select("-password -refreshToken");
   if (!user) {
     throw new ApiError(401, "Unauthorized request");
   }
