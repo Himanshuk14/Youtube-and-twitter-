@@ -216,10 +216,40 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
+const updateAvatar = asyncHandler(async (req, res) => {
+  const avatarFilePath = req.file?.path;
+  if (!avatarFilePath) {
+    throw new ApiError(400, "avatar file is required");
+  }
+  const avatar = await uploadOnCloudinary(avatarFilePath);
+  if (!avatar) {
+    throw new ApiError(500, "Error while uploading avatar");
+  }
+  const user = user
+    .findByIdAndUpdate(
+      req.user?._id,
+      {
+        avatar: avatar.url,
+      },
+      {
+        new: true,
+      }
+    )
+    .select("-password -refreshToken");
+  if (!user) {
+    throw new ApiError(401, "Unauthorized request");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "avatar image updated succesfully"));
+});
+
 export {
   registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
   changeCurrentPassword,
+  updateAvatar,
 };
