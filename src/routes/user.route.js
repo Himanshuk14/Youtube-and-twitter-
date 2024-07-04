@@ -8,6 +8,7 @@ import {
   updateAvatar,
   updateCoverImage,
   updateFields,
+  getCurrentUser,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -38,5 +39,6 @@ router
   .post(verifyJWT, upload.single("coverImage"), updateCoverImage);
 
 router.route("/update-fields").post(verifyJWT, updateFields);
+router.route("/current-user").get(verifyJWT, getCurrentUser);
 
 export default router;

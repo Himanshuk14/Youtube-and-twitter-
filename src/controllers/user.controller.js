@@ -296,6 +296,12 @@ const updateFields = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "fullname and email updated succesfully"));
 });
 
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "User fetched successfully"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -305,4 +311,5 @@ export {
   updateAvatar,
   updateCoverImage,
   updateFields,
+  getCurrentUser,
 };
