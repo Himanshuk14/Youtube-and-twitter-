@@ -243,6 +243,59 @@ const updateAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "avatar image updated succesfully"));
 });
 
+const updateCoverImage = asyncHandler(async (req, res) => {
+  const coverImagePath = req.file?.path;
+  if (!coverImagePath) {
+    throw new ApiError(400, "coverImage is required !");
+  }
+
+  const coverImage = await uploadOnCloudinary(coverImagePath);
+  if (!coverImage.url) {
+    throw new ApiError(500, "error uplaoding the coverImage");
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        coverImage: coverImage.url,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+  if (!user) {
+    throw new ApiError(401, "Unauthorized request");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "CoverImage updated succesfully"));
+});
+
+const updateFields = asyncHandler(async (req, res) => {
+  const { fullName, email } = req.body;
+  if (!fullName && !email) {
+    throw new ApiError(400, "fullname or email is required to update it");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        fullName,
+        email: email,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  if (!user) {
+    throw new ApiError(401, "Unauthorized request");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "fullname and email updated succesfully"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -250,4 +303,6 @@ export {
   refreshAccessToken,
   changeCurrentPassword,
   updateAvatar,
+  updateCoverImage,
+  updateFields,
 };
